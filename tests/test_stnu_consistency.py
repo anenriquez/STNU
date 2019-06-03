@@ -1,16 +1,17 @@
 import unittest
 import json
 import os
-from temporal.networks.stnu import STNU
+import networkx as nx
+from src.temporal_networks.stnu import STNU
 
-STNU_DATA = "data/stnu_two_tasks.json"
+STNU1 = "data/stnu_two_tasks.json"
 
 
 class TestSTNUconsistency(unittest.TestCase):
     def setUp(self):
 
         my_dir = os.path.dirname(__file__)
-        stnu_json = os.path.join(my_dir, STNU_DATA)
+        stnu_json = os.path.join(my_dir, STNU1)
 
         print("my dir:", my_dir)
         print("stnu_json: ", stnu_json)
@@ -20,7 +21,7 @@ class TestSTNUconsistency(unittest.TestCase):
         self.stnu = STNU.from_dict(stnu_dict)
 
     def test_consistency(self):
-        minimal_stnu = self.stnu.floyd_warshall()
+        minimal_stnu = nx.floyd_warshall(self.stnu)
         self.assertTrue(self.stnu.is_consistent(minimal_stnu))
 
         self.stnu.update_edges(minimal_stnu)
@@ -28,7 +29,7 @@ class TestSTNUconsistency(unittest.TestCase):
         completion_time = self.stnu.get_completion_time()
         makespan = self.stnu.get_makespan()
 
-        self.assertEqual(completion_time, 100)
+        self.assertEqual(completion_time, 59)
         self.assertEqual(makespan, 100)
 
 
